@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clono el repo desde GitHub
-                git clone https://github.com/pablonssss/repojenkins.git'
+                git 'https://github.com/pablonssss/repojenkins.git'
             }
         }
 
