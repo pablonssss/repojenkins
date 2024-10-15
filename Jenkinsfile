@@ -35,9 +35,10 @@ pipeline {
 
         stage('Deploy en Apache') {
             steps {
-                // Copiar el archivo index.html al servidor Apache en VM2
+                // Primero copio el archivo a un directorio temporal y luego lo muevo con sudo
                 sshagent(['1092453d-8fad-4168-9714-ba0d89b5773c']) {
-                    sh 'scp -o StrictHostKeyChecking=no index.html pablo@10.0.2.17:/var/www/html/index.html'
+                    sh '''scp -o StrictHostKeyChecking=no index.html pablo@10.0.2.17:/home/pablo/index.html
+                    ssh pablo@10.0.2.17 "sudo mv /home/pablo/index.html /var/www/html/index.html"         '''
                 }
             }
         }
