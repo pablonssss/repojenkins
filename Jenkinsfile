@@ -4,34 +4,40 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clono el repo desde GitHub
-                git clone 'https://github.com/pablonssss/repojenkins.git'
+                // Clonar el repositorio desde GitHub
+                git branch: 'main', url: 'https://github.com/pablonssss/repojenkins.git'
             }
         }
 
-        stage('Verifico si el apache esta instalado') {
+        stage('Verifico si Apache está instalado') {
             steps {
-                // Verifica si Apache está instalado en la VM2
+                // Verificar si Apache está instalado en VM2, instalar si es necesario
                 sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
-                    sh 'ssh -o StrictHostKeyChecking=no pablo@10.0.2.17 "sudo systemctl status apache2 || sudo apt-get install apache2 -y"'
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no pablo@10.0.2.17 "
+                        if ! systemctl is-active --quiet apache2; then
+                            sudo apt-get update
+                            sudo apt-get install apache2 -y
+                        fi"
+                    '''
                 }
             }
         }
 
-        stage('Configure Apache') {
+        stage('Configurar Apache') {
             steps {
-                // Configura Apache en la VM2
+                // Configurar y habilitar Apache en la VM2
                 sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
-                    sh 'ssh pablo@10.0.2.17 "sudo systemctl start apache2 && sudo systemctl enable apache2"'
+                    sh 'ssh pablo@10.0.2.17 "sudo systemctl is-active --quiet apache2 || sudo systemctl start apache2 && sudo systemctl enable apache2"'
                 }
             }
         }
 
-        stage('Deploy Apache') {
+        stage('Deploy en Apache') {
             steps {
-                // Copia el archivo index.html al directorio de Apache en la VM2
+                // Copiar el archivo index.html al servidor Apache en VM2
                 sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
-                    sh 'scp index.html pablo@10.0.2.17:/var/www/html/index.html'
+                    sh 'scp -o StrictHostKeyChecking=no index.html pablo@10.0.2.17:/var/www/html/index.html'
                 }
             }
         }
@@ -39,11 +45,12 @@ pipeline {
 
     post {
         success {
+            // Mensaje en caso de éxito
             echo 'Despliegue completado con éxito en Apache (VM2).'
         }
         failure {
+            // Mensaje en caso de fallo
             echo 'El pipeline ha fallado. Verifica los logs para más detalles.'
         }
     }
 }
-
