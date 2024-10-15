@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Apache') {
+        stage('Deploy Apache') {
             steps {
                 // Copia el archivo index.html al directorio de Apache en la VM2
                 sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
