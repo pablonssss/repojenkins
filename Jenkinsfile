@@ -12,7 +12,7 @@ pipeline {
         stage('Verifico si Apache está instalado') {
             steps {
                 // Verificar si Apache está instalado en VM2, instalar si es necesario
-                sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
+                sshagent(['1092453d-8fad-4168-9714-ba0d89b5773c']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no pablo@10.0.2.17 "
                         if ! systemctl is-active --quiet apache2; then
@@ -27,7 +27,7 @@ pipeline {
         stage('Configurar Apache') {
             steps {
                 // Configurar y habilitar Apache en la VM2
-                sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
+                sshagent(['1092453d-8fad-4168-9714-ba0d89b5773c']) {
                     sh 'ssh pablo@10.0.2.17 "sudo systemctl is-active --quiet apache2 || sudo systemctl start apache2 && sudo systemctl enable apache2"'
                 }
             }
@@ -36,7 +36,7 @@ pipeline {
         stage('Deploy en Apache') {
             steps {
                 // Copiar el archivo index.html al servidor Apache en VM2
-                sshagent(['55c5edfe-cded-4a87-937b-b381846887a3']) {
+                sshagent(['1092453d-8fad-4168-9714-ba0d89b5773c']) {
                     sh 'scp -o StrictHostKeyChecking=no index.html pablo@10.0.2.17:/var/www/html/index.html'
                 }
             }
